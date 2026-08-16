@@ -1,0 +1,26 @@
+{
+  "name": "@jkinco/pptx-export",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "True PPTX export via PptxGenJS",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jkinco/scene-schema": "workspace:*",
+    "pptxgenjs": "^3.12.0",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4",
+    "jsdom": "25.0.1"
+  }
+}

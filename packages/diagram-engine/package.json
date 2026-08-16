@@ -1,0 +1,21 @@
+{
+  "name": "@jkinco/diagram-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Native diagram objects with 10 layout algorithms",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+  "@jkinco/scene-schema": "workspace:*"
+},
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

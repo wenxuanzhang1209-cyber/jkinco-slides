@@ -1,0 +1,25 @@
+{
+  "name": "@jkinco/ai-editor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Scoped AI edits through the command system",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+  "@jkinco/scene-schema": "workspace:*",
+  "@jkinco/command-engine": "workspace:*",
+  "@jkinco/layout-engine": "workspace:*",
+  "@jkinco/rich-text": "workspace:*",
+  "@jkinco/ai-sdk": "workspace:*"
+},
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

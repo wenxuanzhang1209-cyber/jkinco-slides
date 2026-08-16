@@ -1,0 +1,24 @@
+{
+  "name": "jkinco-slides",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JKinco Slides — AI-native editable presentation platform (monorepo)",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @jkinco/web dev",
+    "dev:web": "pnpm --filter @jkinco/web dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r --workspace-concurrency=4 test",
+    "test:unit": "vitest run",
+    "test:e2e": "pnpm --filter @jkinco/web test:e2e",
+    "typecheck": "pnpm -r typecheck",
+    "lint:types": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

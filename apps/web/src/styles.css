@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #1e293b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Slide canvas cursors */
+.cursor-grab {
+  cursor: grab;
+}
+.cursor-grabbing {
+  cursor: grabbing;
+}
+.cursor-pan {
+  cursor: move;
+}
+
+/* Contenteditable text editing overlay */
+.text-edit-surface:focus {
+  outline: none;
+}
+.text-edit-surface [contenteditable] {
+  outline: none;
+  caret-color: #1e56a0;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.presenter-laser {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 163, 61, 0.9) 0%, rgba(232, 163, 61, 0.35) 40%, transparent 70%);
+  width: 48px;
+  height: 48px;
+  transform: translate(-24px, -24px);
+  transition: transform 80ms linear;
+}
+
+.presenter-spotlight {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  -webkit-mask-image: radial-gradient(circle 120px at var(--sx, 50%) var(--sy, 50%), transparent 60px, black 140px);
+  mask-image: radial-gradient(circle 120px at var(--sx, 50%) var(--sy, 50%), transparent 60px, black 140px);
+}
