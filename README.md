@@ -6,6 +6,10 @@
 
 # JKinco Slides — AI 原生可编辑 PPT 平台
 
+## 界面预览
+
+![JKinco Slides 编辑器](docs/screenshots/editor.png)
+
 按照《JKinco Slides 世界级 AI 原生可编辑 PPT 平台——成熟产品开发方案》(v1.0) 从零完成的完整实现。
 产品本体：**一个 AI Native、对象级可编辑、设计级交互、支持 PPTX 往返的 Web Presentation Studio。**
 
