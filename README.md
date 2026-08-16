@@ -6,6 +6,8 @@
 
 # JKinco Slides — AI 原生可编辑 PPT 平台
 
+> **English overview** · JKinco Slides is an AI-native web presentation studio with object-level editing, semantic layout, and PPTX round-trip. It ships a command system (validate → execute → inverse), a semantic scene graph, ten layout patterns with a constraint solver, native diagram and chart engines, and a Brand Kit. Quick start: `pnpm install`, `pnpm -r typecheck`, `pnpm --filter @jkinco/web dev`.
+
 ## 界面预览
 
 ![JKinco Slides 编辑器](docs/screenshots/editor.png)
