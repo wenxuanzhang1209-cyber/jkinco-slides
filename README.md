@@ -1,3 +1,9 @@
+<p align="left">
+  <img src="https://github.com/wenxuanzhang1209-cyber/jkinco-slides/actions/workflows/ci.yml/badge.svg" />
+  <img src="https://img.shields.io/github/license/wenxuanzhang1209-cyber/jkinco-slides" />
+  <img src="https://img.shields.io/github/v/release/wenxuanzhang1209-cyber/jkinco-slides?label=release" />
+</p>
+
 # JKinco Slides — AI 原生可编辑 PPT 平台
 
 按照《JKinco Slides 世界级 AI 原生可编辑 PPT 平台——成熟产品开发方案》(v1.0) 从零完成的完整实现。
