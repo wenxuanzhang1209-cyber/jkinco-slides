@@ -40,7 +40,15 @@ jobs:
       # 跑一次，把输出留下来给下一步数。
       # 不要为了数数再跑第二遍 —— 这套 monorepo 有 19 个 workspace，
       # 跑两遍就是白白翻倍的 CI 时间。
+      #
+      # NO_COLOR 是必须的：默认情况下 vitest 在 CI 里照样输出颜色，
+      # 那一行长这样（\e 是真的 ESC 字节）：
+      #     Tests \e[22m \e[1m\e[32m31 passed\e[39m
+      # 于是 `grep 'Tests +[0-9]+ passed'` 一条都匹配不到 —— 第一版就是
+      # 这么挂的：测试全过了，卡在数数上。
       - name: Run tests
+        env:
+          NO_COLOR: "1"
         run: |
           set -o pipefail
           pnpm -r --workspace-concurrency=4 test 2>&1 | tee /tmp/test-output.txt
@@ -49,14 +57,26 @@ jobs:
       # 它只是安静地说着一件不再为真的事，直到有人真的 clone 下来数了一遍。
       - name: Badge count matches reality
         run: |
-          set -euo pipefail
-          total=$(grep -oE 'Tests[[:space:]]+[0-9]+ passed' /tmp/test-output.txt \
-                  | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
+          # 这里刻意不用 set -e：grep 没匹配到会返回 1，那样脚本会在打印
+          # 任何诊断信息之前就退出，只留下一个「exit code 1」让人猜。
+          set -uo pipefail
+
+          # 再剥一次 ANSI，以防哪天 NO_COLOR 不再被某个 reporter 认。
+          clean=$(sed -E $'s/\x1b\\[[0-9;]*[A-Za-z]//g' /tmp/test-output.txt)
+
+          total=$(printf '%s\n' "$clean" \
+                  | grep -oE 'Tests[[:space:]]+[0-9]+ passed' \
+                  | grep -oE '[0-9]+' \
+                  | awk '{s+=$1} END {print s+0}')
           claimed=$(grep -oE 'badge/tests-[0-9]+%20passing' README.md \
-                    | grep -oE '[0-9]+' | head -1 || true)
-          echo "README 徽章: ${claimed:-未找到}   实际跑过: $total"
-          if [ "$total" -eq 0 ]; then
-            echo "::error::没能从测试输出里数出测试数——reporter 换了？"
+                    | grep -oE '[0-9]+' | head -1)
+
+          echo "README 徽章: ${claimed:-未找到}   实际跑过: ${total:-0}"
+
+          if [ "${total:-0}" -eq 0 ]; then
+            echo "::error::没能从测试输出里数出测试数。vitest 的 reporter 换了？"
+            echo "--- 输出末尾 40 行，供排查 ---"
+            tail -40 /tmp/test-output.txt
             exit 1
           fi
           if [ -z "${claimed:-}" ]; then
@@ -67,3 +87,4 @@ jobs:
             echo "::error::README 徽章写着 $claimed 个测试，实际跑了 $total 个。更新 README.md。"
             exit 1
           fi
+          echo "一致。"
