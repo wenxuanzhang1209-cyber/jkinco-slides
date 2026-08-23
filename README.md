@@ -1,109 +1,106 @@
-<p align="left">
-  <img src="https://github.com/wenxuanzhang1209-cyber/jkinco-slides/actions/workflows/ci.yml/badge.svg" />
-  <img src="https://img.shields.io/github/license/wenxuanzhang1209-cyber/jkinco-slides" />
-  <img src="https://img.shields.io/github/v/release/wenxuanzhang1209-cyber/jkinco-slides?label=release" />
+<p align="center">
+  <a href="https://github.com/wenxuanzhang1209-cyber/jkinco-slides/actions/workflows/ci.yml"><img src="https://github.com/wenxuanzhang1209-cyber/jkinco-slides/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <img src="https://img.shields.io/github/license/wenxuanzhang1209-cyber/jkinco-slides?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/tests-269%20passing-3fb950?style=flat-square" alt="Tests" />
+  <img src="https://img.shields.io/badge/packages-18-58a6ff?style=flat-square" alt="Packages" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
 </p>
 
-# JKinco Slides — AI 原生可编辑 PPT 平台
+# JKinco Slides
 
-> **English overview** · JKinco Slides is an AI-native web presentation studio with object-level editing, semantic layout, and PPTX round-trip. It ships a command system (validate → execute → inverse), a semantic scene graph, ten layout patterns with a constraint solver, native diagram and chart engines, and a Brand Kit. Quick start: `pnpm install`, `pnpm -r typecheck`, `pnpm --filter @jkinco/web dev`.
+**An AI-native presentation studio where every object stays editable — and PPTX survives the round trip.**
 
-## 界面预览
+<sub>AI 原生的演示文稿工作台：每个对象都可编辑，PPTX 进出不失真。</sub>
 
-![JKinco Slides 编辑器](docs/screenshots/editor.png)
+![Editor](docs/screenshots/editor.png)
 
-按照《JKinco Slides 世界级 AI 原生可编辑 PPT 平台——成熟产品开发方案》(v1.0) 从零完成的完整实现。
-产品本体：**一个 AI Native、对象级可编辑、设计级交互、支持 PPTX 往返的 Web Presentation Studio。**
+---
 
-## 快速开始
+## Why this exists
+
+AI slide generators have a common failure mode: they hand you an image, or a rigid template,
+or markup that collapses the moment you try to move one box. The generation is impressive and
+the *editing* is where it falls apart — which is a problem, because nobody ships the first
+draft.
+
+And when you export to PPTX to finish the job in PowerPoint, text has usually become a
+picture of text.
+
+JKinco Slides treats the deck as a **semantic scene graph**, not pixels:
+
+- **Every object stays a real object.** Move it, restyle it, let AI rewrite just that one —
+  the rest of the deck does not shift underneath you.
+- **Every edit is a command with an inverse.** `validate → execute → inverse`, so undo is
+  exact rather than approximate, and AI edits go through the same path a human edit does.
+- **PPTX round trip preserves types.** Exported text is still text; exported shapes are still
+  shapes. Import grades each element as `native` / `preview` / `unsupported` and **never
+  silently corrupts** what it cannot represent.
+
+<sub>AI 生成 PPT 常见的失败方式是：给你一张图、一个死模板，或是一挪就散架的标记。
+生成很惊艳，垮在**编辑**上——而没人会直接用第一稿。导出到 PPTX 之后，文字往往变成了
+文字的图片。这个项目把演示文稿当作**语义场景图**而不是像素来处理。</sub>
+
+## What's inside
+
+18 packages, each independently testable:
+
+| Layer | Packages |
+|---|---|
+| **Document core** | `scene-schema` · `command-engine` · `slide-engine` · `rich-text` |
+| **Layout & visuals** | `layout-engine` (10 semantic patterns + constraint solver) · `diagram-engine` (10 layout algorithms) · `chart-engine` (data-native, ECharts) · `renderer` (SVG / print HTML) |
+| **Quality & brand** | `qa-engine` (geometry / typography / content checks + auto-fix) · `style-engine` · `brand-engine` (logo, fonts, watermark, lock rules) · `design-system` |
+| **AI** | `ai-sdk` (pluggable providers, **deterministic offline fallback**) · `ai-planner` (deck graph → storyboard → progressive generation) · `ai-editor` (scoped edits: object / selection / slide / section / deck) |
+| **Interop & collaboration** | `pptx-export` · `pptx-import` · `collaboration` (Yjs CRDT command log + presence) |
+
+## Quick start
+
+Requires Node ≥ 20 and pnpm 9.
 
 ```bash
-# 依赖（Node ≥ 20，pnpm 9）
 pnpm install
+pnpm --filter @jkinco/web dev      # http://localhost:4173
+```
 
-# 运行全部单元测试（269 个）
-pnpm -r test
+Everything else:
 
-# 运行全部类型检查
+```bash
+pnpm -r test                       # 269 unit tests
 pnpm -r typecheck
-
-# 启动开发服务器（http://localhost:4173）
-pnpm --filter @jkinco/web dev
-
-# 生产构建
 pnpm --filter @jkinco/web build
-
-# E2E 测试（Playwright，需先 npx playwright install chromium）
-pnpm --filter @jkinco/web test:e2e
+pnpm --filter @jkinco/web test:e2e # Playwright — run `npx playwright install chromium` first
 ```
 
-## 目录结构
+## Design decisions worth knowing
 
-```
-apps/
-  web/                  React + Vite + Tailwind 编辑器 Web 应用
-packages/
-  scene-schema/         语义 Scene Graph 核心 Schema（§3/§37，960×540 pt）
-  command-engine/       命令系统：validate → execute → inverse + 序列化（§38/§7.2）
-  slide-engine/         文档引擎：选择、视口、几何、吸附、剪贴板、快捷键、持久化
-  rich-text/            文本测量、压缩、§5.3 溢出处理顺序
-  layout-engine/        语义版式模式 ×10 + 约束求解器 + 质量评分 + 密度门禁（§14/§5）
-  diagram-engine/       原生图示对象 + 10 种布局算法（§11）
-  chart-engine/         Data-native 图表：ECharts 选项、类型推荐、数据绑定（§12）
-  renderer/             Slide → SVG / 打印 HTML（§17）
-  qa-engine/            Visual QA：几何/排版/内容/视觉/整册检查 + 自动修复（§15）
-  style-engine/         主题应用、Style DNA 提取、封面/章节语法、A/B/C 变体（§10/§28）
-  brand-engine/         企业 Brand Kit：Logo/字体/页脚/保密标识/水印/锁定规则（§30）
-  ai-sdk/               可插拔模型 Provider + 任务分级路由（§40，离线确定性回退）
-  ai-planner/           Deck Graph、Storyboard、渐进式生成管线（§4/§9/§26/§8.3）
-  ai-editor/            作用域 AI 编辑（对象/选区/页/章节/整册 → 命令序列）（§27）
-  pptx-export/          真 PPTX 导出（PptxGenJS：文本仍是文本、形状仍是形状）（§17）
-  pptx-import/          高保真 PPTX 导入（原生/近似/预览/不支持分级，永不静默破坏）（§16）
-  collaboration/        Yjs 命令日志 CRDT + Presence 实时协同（§19/§20）
-  design-system/        Design Tokens（§8.1 动效规范）+ Radix 无障碍组件
-```
+**The AI layer has a deterministic offline fallback.** Every AI feature degrades to a
+rule-based path when no model is configured, so the editor stays usable — and the test suite
+runs without a network or an API key.
 
-## 已实现的方案要点
+**Import never fails silently.** A PPTX element that cannot be represented natively is graded
+`preview` or `unsupported` rather than quietly dropped. Losing a shape without being told is
+worse than being told the shape is only approximate.
 
-| 方案章节 | 实现 |
-|---|---|
-| §0 五个引擎 | Narrative Planner / Slide Compiler / Layout Engine / AI Co-editor / PPTX Round-trip |
-| §2 Hybrid DOM+SVG | 文本 DOM、形状/连线 SVG、图表 ECharts、统一 960×540 逻辑坐标 |
-| §3 语义 Scene Graph | role / semantic(topic, importance, sourceIds, aiEditable) |
-| §4 生成链路 | 研究 → 叙事 → Deck Graph（只生成结构不生成坐标）→ Storyboard → 版式 → 约束求解 → QA |
-| §5 少文字硬约束 | 标题≤18 / 正文≤120 / 项目符号≤5 / 字号下限 18；密度分（≤60 良好，>85 拆页）；§5.3 五步顺序（缩小字号是最后手段） |
-| §6 编辑器布局 | 缩略图轨道 / 画布 / 上下文检查器 / 底部 AI Bar / ⌘K 命令面板 |
-| §7 编辑手感 | 框选、多选、Alt 复制、Shift 约束、方向键 1/10pt、吸附 + 智能参考线、无限 Undo、复制/粘贴保留样式、锁定/隐藏、层级、对齐/分布 |
-| §7.2 AI 复用命令系统 | AI 的所有修改都是可撤销、可回放、可审计的 Command |
-| §8 动效规范 | 80–350ms 分档时长、拖拽零延迟（预览+松手提交） |
-| §9 Storyboard | 生成前确认故事线：改顺序/删除/合并/增加/改核心信息/图为主/数据为主 |
-| §10 Style DNA | 6 套子风格主题 + 从历史 PPT 确定性提取 Style DNA |
-| §11 Diagram-native | 全部真对象，10 种布局算法（层次/DAG/泳道/时间线/放射/矩阵/架构/漏斗/环/金字塔） |
-| §12 Data-native | 图表绑定数据集，"Update deck" 全册刷新 |
-| §13 AI 右键 | 按元素类型（Text/Diagram/Image/Slide）出 AI 动作 |
-| §14 三层 Layout | 语义模式 → 约束求解器 → 质量评分（层级/对齐/间距/平衡/密度/对比/品牌/相似度惩罚），3–8 候选 |
-| §15 Visual QA | 五组检查 + 自动修复命令 + Ready 状态 |
-| §16 PPTX 导入 | 文本/形状/图片/连线/表格/图表解析，元素分级，SmartArt 转换 |
-| §17 真 PPTX 导出 | PPTX/JSON/SVG/PNG/PDF 打印视图 |
-| §18 演示模式 | 演讲者视图/备注/计时器/激光笔/画笔/聚光灯/演讲稿/预计时长/Q&A 预测 |
-| §19 协同 | Yjs 命令日志 CRDT + 实时光标 Presence + 分享权限 UI |
-| §25/§26 首页与新建 | "你要讲什么？" 主入口、最多 3 个澄清问题、Storyboard、渐进式构建 |
-| §27 AI 修改范围 | 对象/选区/页/所选页/章节/整册 |
-| §28 多变体 | A Executive / B Visual / C Technical |
-| §30 Brand Kit | Logo/主辅色/页脚/保密标识/水印/管理员锁定 |
-| §34 版本控制 | 命名 checkpoint 保存/列表/恢复 |
-| §35 MVP 清单 | 20 项全部实现 |
-| §43 测试门禁 | 单元 269 项 + PPTX 往返语料 + Playwright E2E 6 项 |
-| §44 手感细节 | 双击即编辑/选框精准/吸附不粘/拖拽无延迟/复制粘贴保样式/AI 可撤销/缩略图实时/导出不错位 |
+**Undo is derived, not recorded.** Each command computes its own inverse, so undo cannot drift
+out of sync with the operation it is undoing.
 
-## 测试结果（全部通过）
+## Status
 
-- **单元测试：269 passed / 269**（19 个包 + Web 应用）
-- **类型检查：0 errors**（全部包，strict + noUncheckedIndexedAccess）
-- **生产构建：成功**
-- **Playwright E2E：6 passed / 6**（创建→生成→Storyboard→构建→编辑→拖拽→Undo→导入→导出→分享→演示→AI 修改）
+Working implementation with CI (install → typecheck) and 269 passing unit tests. Single
+maintainer; issues and pull requests are welcome.
 
-## AI 说明
+<sub>已实现并有 CI（安装 → 类型检查）与 269 个通过的单元测试。单人维护，欢迎 Issue 与 PR。</sub>
 
-- 默认使用 `LocalRuleProvider`（确定性离线规则引擎）：无需 API Key 即可完整跑通生成、精简、改写、版式、密度门禁与 QA。
-- 通过 `createDefaultRouter({ openai: { apiKey, baseURL, model } })` 接入 OpenAI 兼容端点后，推理任务自动路由到真实模型（§40 可插拔）。
+## License
+
+[MIT](LICENSE) © 2026 JKinco
+
+---
+
+<sub>
+<b>JKinco</b> — local-first tools for work whose data cannot leave the building ·
+<a href="https://github.com/wenxuanzhang1209-cyber/jkinco-listen-open">Listen</a> ·
+<a href="https://github.com/wenxuanzhang1209-cyber/jkinco-slides">Slides</a> ·
+<a href="https://github.com/wenxuanzhang1209-cyber/JKinco-Skills-Lab">Skills Lab</a> ·
+<a href="https://github.com/wenxuanzhang1209-cyber/personal-life-hub">Life Hub</a> ·
+<a href="https://github.com/wenxuanzhang1209-cyber/jkinco-tools">Tools</a>
+</sub>
