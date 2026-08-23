@@ -6,7 +6,14 @@ on:
   pull_request:
 
 jobs:
+  # 之前这里只有 typecheck 一个 job，而 README 上挂着 CI 徽章和「269 tests
+  # passing」。也就是说：测试存在、本地能过，但没有任何东西在执行它们 ——
+  # 谁把一个测试改挂了，CI 依然是绿的，徽章依然写着 269 passing。
+  #
+  # 拆成两个 job 而不是串在一起：typecheck 挂了和测试挂了是两类问题，
+  # 分开报能一眼看出是哪一类，也能并行。
   typecheck:
+    name: Typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,3 +24,46 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # 跑一次，把输出留下来给下一步数。
+      # 不要为了数数再跑第二遍 —— 这套 monorepo 有 19 个 workspace，
+      # 跑两遍就是白白翻倍的 CI 时间。
+      - name: Run tests
+        run: |
+          set -o pipefail
+          pnpm -r --workspace-concurrency=4 test 2>&1 | tee /tmp/test-output.txt
+
+      # README 的徽章写着一个具体数字。数字会过期，而过期的徽章不会报错 ——
+      # 它只是安静地说着一件不再为真的事，直到有人真的 clone 下来数了一遍。
+      - name: Badge count matches reality
+        run: |
+          set -euo pipefail
+          total=$(grep -oE 'Tests[[:space:]]+[0-9]+ passed' /tmp/test-output.txt \
+                  | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
+          claimed=$(grep -oE 'badge/tests-[0-9]+%20passing' README.md \
+                    | grep -oE '[0-9]+' | head -1 || true)
+          echo "README 徽章: ${claimed:-未找到}   实际跑过: $total"
+          if [ "$total" -eq 0 ]; then
+            echo "::error::没能从测试输出里数出测试数——reporter 换了？"
+            exit 1
+          fi
+          if [ -z "${claimed:-}" ]; then
+            echo "::warning::README 里没有测试数徽章，跳过核对"
+            exit 0
+          fi
+          if [ "$claimed" != "$total" ]; then
+            echo "::error::README 徽章写着 $claimed 个测试，实际跑了 $total 个。更新 README.md。"
+            exit 1
+          fi
