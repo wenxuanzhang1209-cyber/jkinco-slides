@@ -1,0 +1,16 @@
+name: Feature Request
+description: 提一个新想法
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: 需求描述
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: 价值与场景
+      placeholder: 解决什么问题、谁会用到
