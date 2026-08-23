@@ -1,0 +1,90 @@
+name: Bug Report
+description: 报告一个问题
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+      description: 请描述预期行为与实际行为
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤
+      placeholder: 1. ... 2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本/环境
+      placeholder: Node 版本、pnpm 版本、浏览器
+*** Add File: /Users/wenxuanzhang/Desktop/Vibe Coding/05_JKinco工具与作品/jkinco-slides/.github/ISSUE_TEMPLATE/feature_request.yml
+name: Feature Request
+description: 提一个新想法
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: 需求描述
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: 价值与场景
+      placeholder: 解决什么问题、谁会用到
+*** Add File: /Users/wenxuanzhang/Desktop/Vibe Coding/08_个人生活/个人生活工作中枢/.github/ISSUE_TEMPLATE/bug_report.yml
+name: Bug Report
+description: 报告一个问题
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤
+      placeholder: 1. ... 2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本/环境
+*** Add File: /Users/wenxuanzhang/Desktop/Vibe Coding/08_个人生活/个人生活工作中枢/.github/ISSUE_TEMPLATE/feature_request.yml
+name: Feature Request
+description: 提一个新想法
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: 需求描述
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: 价值与场景
+*** Add File: /Users/wenxuanzhang/Desktop/Vibe Coding/08_个人生活/个人生活工作中枢/CHANGELOG.md
+# Changelog
+
+## v0.1.0 (2026-08-16)
+
+- 首个公开版本
+- 今日总览、日程、任务库、问题与决策
+- 收件箱、资料库、项目、模板、复盘
+- 本地优先存储，支持 JSON 导入导出
+- 私密空间与全局搜索
